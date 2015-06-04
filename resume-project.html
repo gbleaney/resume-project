@@ -3,12 +3,34 @@
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
+    <div class="container">
+	    <header>
+	        <h1>Some Name</h1>
+	    </header>
 
-  {{> hello}}
+    	{{> loginButtons}}
+
+    	{{#if currentUser}}
+
+		    <ul>
+		        {{#each points}}
+		            {{> point}}
+		        {{/each}}
+		        <li>
+			      	<form class="new-point">
+						<input type="text" name="text" placeholder="Type to add new points" />
+					</form>
+				</li>
+		    </ul>
+	    {{/if}}
+
+
+    </div>
 </body>
 
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+<template name="point">
+    <li>
+    	{{point}}
+    	<button class="delete">&times;</button>
+    </li>
 </template>
