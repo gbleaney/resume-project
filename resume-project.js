@@ -10,6 +10,9 @@ if (Meteor.isClient) {
     },
     pointsInSection: function(section){
       return Points.find({section: section});
+    },
+    userEmail: function(){
+      return Meteor.user().emails[0].address;
     }
   });
   Template.body.events({
