@@ -22,6 +22,32 @@
 					</form>
 				</li>
 		    </ul>
+		    <header>
+		    	<h2>Skills</h2>
+		    </header>
+		    <ul>
+		        {{#each pointsInSection "skills"}}
+		            {{> point}}
+		        {{/each}}
+		        <li>
+			      	<form class="new-skills">
+						<input type="text" name="text" placeholder="Type to add new skills point" />
+					</form>
+				</li>
+		    </ul>
+		    <header>
+		    	<h2>Education</h2>
+		    </header>
+		    <ul>
+		        {{#each pointsInSection "education"}}
+		            {{> point}}
+		        {{/each}}
+		        <li>
+			      	<form class="new-education">
+						<input type="text" name="text" placeholder="Type to add new education point" />
+					</form>
+				</li>
+		    </ul>
 	    {{/if}}
 
 
