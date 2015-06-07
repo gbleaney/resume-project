@@ -7,16 +7,47 @@ if (Meteor.isClient) {
   Template.body.helpers({
     points: function() {
       return Points.find({});
+    },
+    pointsInSection: function(section){
+      return Points.find({section: section});
+    },
+    userEmail: function(){
+      return Meteor.user().emails[0].address;
     }
   });
-
   Template.body.events({
   "submit .new-point": function (event) {
     // This function is called when the new task form is submitted
 
     var text = event.target.text.value;
 
-    Meteor.call("addPoint", text);
+    Meteor.call("addPoint", {text: text});
+
+    // Clear form
+    event.target.text.value = "";
+
+    // Prevent default form submit
+    return false;
+  },
+  "submit .new-skills": function (event) {
+    // This function is called when the new task form is submitted
+    var text = event.target.text.value;
+
+    Meteor.call("addPoint", {text: text, 
+                          section: "skills"});
+
+    // Clear form
+    event.target.text.value = "";
+
+    // Prevent default form submit
+    return false;
+  },
+  "submit .new-education": function (event) {
+    // This function is called when the new task form is submitted
+    var text = event.target.text.value;
+
+    Meteor.call("addPoint", {text: text, 
+                          section: "education"});
 
     // Clear form
     event.target.text.value = "";
@@ -30,6 +61,7 @@ if (Meteor.isClient) {
   }
 
 });
+
 
 }
 
@@ -45,14 +77,15 @@ if (Meteor.isServer) {
 
 
 Meteor.methods({
-  addPoint: function (text) {
+  addPoint: function (data) {
     // Make sure the user is logged in before inserting a task
     if (! Meteor.userId()) {
       throw new Meteor.Error("not-authorized");
     }
 
     Points.insert({
-      point: text,
+      point: data.text,
+      section: data.section,
       createdAt: new Date(),
       owner: Meteor.userId(),
       username: Meteor.user().username
