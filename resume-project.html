@@ -48,6 +48,9 @@
 					</form>
 				</li>
 		    </ul>
+<!-- 		    <form class="edit-point" id="edit-input">
+		    	<input type="text" name = "text" />
+		    </form> -->
 	    {{/if}}
 
 
@@ -55,8 +58,10 @@
 </body>
 
 <template name="point">
-    <li>
-    	{{point}}
+    <li id={{_id}}>
+    	<form class="edit-point">
+    		<input type="text" name="text" value={{point}}>
+    	</form>
     	<button class="delete">&times;</button>
     </li>
 </template>
