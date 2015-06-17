@@ -48,6 +48,9 @@ if (Meteor.isClient) {
     // Prevent default form submit
     return false;
   },
+  "submit .new-item": function(event) {
+    insertNewItem(event.target.text.value);
+  },
   "submit .edit-point": function(event){
     var text = event.target.text.value;
     if(text === ""){
@@ -85,7 +88,10 @@ Template.item.helpers({
       // Clear form
       event.target.text.value = "";
   }
-
+  function insertNewItem(itemName){
+    Meteor.call("addPoint",{text: "",
+                            item: itemName});
+  }
 }
 
 if (Meteor.isServer) {
