@@ -13,14 +13,14 @@
     	{{#if currentUser}}
 
 		    <ul>
-		        {{#each points}}
+		        <!-- {{#each points}}
 		            {{> point}}
-		        {{/each}}
-		        <li>
-			      	<form class="new-point">
-						<input type="text" name="text" placeholder="Type to add new points" />
-					</form>
-				</li>
+		        {{/each}} -->
+
+		        {{#each items}}
+					{{> item}}					
+				{{/each}}
+
 		    </ul>
 		    <header>
 		    	<h2>Skills</h2>
@@ -29,6 +29,8 @@
 		        {{#each pointsInSection "skills"}}
 		            {{> point}}
 		        {{/each}}
+		        
+		    	
 		        <li>
 			      	<form class="new-skills">
 						<input type="text" name="text" placeholder="Type to add new skills point" />
@@ -48,14 +50,31 @@
 					</form>
 				</li>
 		    </ul>
-<!-- 		    <form class="edit-point" id="edit-input">
-		    	<input type="text" name = "text" />
-		    </form> -->
 	    {{/if}}
 
 
     </div>
 </body>
+
+<template name="item">
+	<div id={{this}}>
+		<header>
+			<form class="edit-item">
+	    		<input type="text" name="text" value={{this}}>
+	    	</form>
+		</header>
+
+		{{#each pointsInItem this}}
+			{{> point}}
+		{{/each}}
+
+		<li>
+	      	<form class="new-point">
+				<input type="text" name="text" placeholder="Type to add new points" />
+			</form>
+		</li>
+	</div>
+</template>
 
 <template name="point">
     <li id={{_id}}>
@@ -65,3 +84,4 @@
     	<button class="delete">&times;</button>
     </li>
 </template>
+

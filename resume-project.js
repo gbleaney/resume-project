@@ -11,6 +11,20 @@ if (Meteor.isClient) {
     pointsInSection: function(section){
       return Points.find({section: section});
     },
+    items: function(){
+      //Return array of distinct items
+      return _.uniq(Points.find({},{
+        sort: {item: 1}, fields: {item: true}
+      }).fetch().map(function(x){
+        return x.item;
+      }), true);
+    },
+    itemsInSection: function(section){
+      return Points.distinct("item",{section: section});
+    },
+    pointsInItem: function(item){
+      return Points.find({item: item});
+    },
     userEmail: function(){
       return Meteor.user().emails[0].address;
     }
@@ -42,18 +56,31 @@ if (Meteor.isClient) {
       Meteor.call("editPointText", this._id, text);
     }
   },
-
+  "submit .edit-item": function(event){
+    // TODO: Find a better way to get old text
+    // Maybe pass the id of some point
+    Meteor.call("editItemText",
+      event.target.text.value,
+      event.target.parentNode.parentNode.id);
+  },
   "click .delete": function () {
     Meteor.call("deletePoint", this._id);
   }
 
 });
+Template.item.helpers({
+  pointsInItem: function(item){
+      return Points.find({item: item});
+    }
+});
   function insertPoint(event, section){
       //Wrapper function for inserting new points under a section
       var text = event.target.text.value;
+      var item = event.target.parentNode.parentNode.id;
 
       Meteor.call("addPoint", {text: text, 
-                            section: section});
+                            section: section,
+                               item: item});
 
       // Clear form
       event.target.text.value = "";
@@ -80,6 +107,7 @@ Meteor.methods({
 
     Points.insert({
       point: data.text,
+      item: data.item,
       section: data.section,
       createdAt: new Date(),
       owner: Meteor.userId(),
@@ -105,5 +133,10 @@ Meteor.methods({
     }
     Points.update({"_id": pointId},
       {$set:{"point": newText}});
+  },
+  editItemText: function(newItem,oldItem){
+    Points.update({item: oldItem},
+      {$set:{item: newItem}},
+      {multi: true});
   }
 });
