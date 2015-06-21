@@ -14,16 +14,10 @@ if (Meteor.isClient) {
     items: function(){
       //Return array of distinct items
       return _.uniq(Points.find({},{
-        sort: {item: 1}, fields: {item: true}
+        sort: {itemID: 1}, fields: {itemID: true}
       }).fetch().map(function(x){
-        return x.item;
+        return x.itemID;
       }), true);
-    },
-    itemsInSection: function(section){
-      return Points.distinct("item",{section: section});
-    },
-    pointsInItem: function(item){
-      return Points.find({item: item});
     },
     userEmail: function(){
       return Meteor.user().emails[0].address;
@@ -66,31 +60,53 @@ if (Meteor.isClient) {
       event.target.text.value,
       event.target.parentNode.parentNode.id);
   },
-  "click .delete": function () {
+  "click .delete-point": function () {
     Meteor.call("deletePoint", this._id);
+  },
+  "submit .new-tag": function(event){
+    var text = event.target.text.value;
+    var id = event.target.parentNode.id;
+    console.log(id);
+    Meteor.call("addTag", text, id);
+  },
+  "click .delete-tag": function(event){
+    Meteor.call("deleteTag",
+      event.target.parentNode.childNodes[1].nodeValue,
+      event.target.parentNode.parentNode.parentNode.id);
   }
-
 });
 Template.item.helpers({
-  pointsInItem: function(item){
-      return Points.find({item: item});
-    }
+  pointsInItemID: function(id){
+    return Points.find({itemID: id});
+  },
+  idToItem: function(id){
+    return idToItem(id);
+  }
 });
   function insertPoint(event, section){
       //Wrapper function for inserting new points under a section
       var text = event.target.text.value;
-      var item = event.target.parentNode.parentNode.id;
+      var itemID = event.target.parentNode.parentNode.id;
+      var item = idToItem(itemID);
+      
 
       Meteor.call("addPoint", {text: text, 
                             section: section,
-                               item: item});
+                               item: item,
+                             itemID: itemID});
 
       // Clear form
       event.target.text.value = "";
   }
   function insertNewItem(itemName){
-    Meteor.call("addPoint",{text: "",
-                            item: itemName});
+    var d = new Date();
+    Meteor.call("addPoint",{text: "placeholder",
+                            item: itemName,
+                            itemID: itemName + d.getTime()});
+  }
+  function idToItem(id){
+    var points = Points.findOne({itemID: id});
+    return points.item;
   }
 }
 
@@ -114,6 +130,8 @@ Meteor.methods({
     Points.insert({
       point: data.text,
       item: data.item,
+      itemID: data.itemID,
+      tags: [],
       section: data.section,
       createdAt: new Date(),
       owner: Meteor.userId(),
@@ -140,9 +158,19 @@ Meteor.methods({
     Points.update({"_id": pointId},
       {$set:{"point": newText}});
   },
-  editItemText: function(newItem,oldItem){
-    Points.update({item: oldItem},
-      {$set:{item: newItem}},
+  editItemText: function(newItemName,itemID){
+    var d = new Date();
+    Points.update({itemID: itemID},
+      {$set:{item: newItemName,
+             itemID: newItemName + d.getTime()}},
       {multi: true});
+  },
+  addTag: function(tag, id){
+    Points.update({_id: id},
+      {$addToSet:{tags: tag}});
+  },
+  deleteTag: function(tag, id){
+    Points.update({_id: id},
+      {$pull:{tags: tag}});
   }
 });
